@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Announcements</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+        }
+
+        #editableContent {
+            margin: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Announcements</h1>
+    <div contenteditable="false" id="editableContent">
+        <p>This is the editable content.</p>
+    </div>
+    <button id="editButton">Edit</button>
+    <button id="addContentButton" style="display: none;">Add Content</button>
+    <button id="submitButton" style="display: none;">Submit</button>
+
+    <script>
+        var isAuthorized = false; // Initially not authorized
+
+        // Function to prompt the user for a password
+        function authenticateUser() {
+            var password = prompt("Please enter the password:");
+            if (password === "secret") {
+                isAuthorized = true; // Set to true if the password is correct
+                document.getElementById("editableContent").contentEditable = true; // Enable editing
+                document.getElementById("editButton").style.display = "none"; // Hide the "Edit" button
+                document.getElementById("submitButton").style.display = "block"; // Show the "Submit" button
+                // Show the "Add Content" button only if authorized
+                if (isAuthorized) {
+                    document.getElementById("addContentButton").style.display = "block";
+                }
+            } else {
+                alert("Incorrect password. You are not authorized to edit this page.");
+            }
+        }
+
+        // Function to reload the page
+        function reloadPage() {
+            location.reload();
+        }
+
+        // Event listener for the "Edit" button
+        document.getElementById("editButton").addEventListener("click", function () {
+            authenticateUser(); // Call the authentication function
+        });
+
+        // Event listener for the "Add Content" button
+        document.getElementById("addContentButton").addEventListener("click", function () {
+            if (!isAuthorized) {
+                alert("You are not authorized to add content. Please enter the correct password.");
+                return;
+            }
+
+            // Create a new section with a title and a paragraph
+            var newSection = document.createElement("section");
+            var newTitle = document.createElement("h2");
+            var newParagraph = document.createElement("p");
+
+            newTitle.innerHTML = "New Section Title";
+            newParagraph.innerHTML = "This is a new section added by the user.";
+
+            newSection.appendChild(newTitle);
+            newSection.appendChild(newParagraph);
+
+            // Append the new section to the editable content
+            document.getElementById("editableContent").appendChild(newSection);
+        });
+
+        // Event listener for the "Submit" button
+        document.getElementById("submitButton").addEventListener("click", function () {
+            if (!isAuthorized) {
+                alert("You are not authorized to submit changes. Please enter the correct password.");
+                return;
+            }
+            var editedContent = document.getElementById("editableContent").innerHTML;
+            localStorage.setItem("editedContent", editedContent);
+            alert("Changes saved: " + editedContent);
+            reloadPage(); // Reload the page after submitting changes
+        });
+
+        // Initial display of shared content
+        var sharedContent = localStorage.getItem("editedContent");
+        if (sharedContent) {
+            document.getElementById("editableContent").innerHTML = sharedContent;
+        }
+    </script>
+</body>
+</html>
